@@ -1,0 +1,8 @@
+fastapi
+langchain
+langgraph
+langchain-postgres
+asyncpg
+psycopg2
+sqlalchemy
+alembic
