@@ -22,6 +22,17 @@ class PersonaBase(BaseModel):
     is_active: bool = True
 
 
+class PersonaLatestResponse(BaseModel):
+    id: UUID
+    username: str = Field(..., min_length=1, max_length=50)
+    public_name: str = Field(..., min_length=1, max_length=100)
+    bio: Optional[str] = None
+    tagline: Optional[str] = Field(None, max_length=100)
+    welcome_message: Optional[str] = None
+    profile_image_url: Optional[str] = Field(None, max_length=512)
+    social_links: Optional[Dict[str, Any]] = None
+
+
 class PersonaCreate(PersonaBase):
     pass
 
