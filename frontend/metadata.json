@@ -1,0 +1,5 @@
+{
+  "name": "Terminal Chat Interface",
+  "description": "A clean, responsive chat interface with a terminal-like aesthetic, featuring a fixed header, a scrollable chat log with streaming messages, and a custom input box with a blinking block caret.",
+  "requestFramePermissions": []
+}
