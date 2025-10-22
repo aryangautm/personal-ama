@@ -7,3 +7,6 @@ psycopg2
 sqlalchemy
 alembic
 pydantic-settings
+langgraph-checkpoint-postgres
+uvicorn
+langchain-google-genai
