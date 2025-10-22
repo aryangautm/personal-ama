@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1.routes import api_router
+from app.memory.checkpointers import pg_checkpointer
 
 
 @asynccontextmanager
@@ -12,6 +13,7 @@ async def lifespan(app: FastAPI):
     """
     Manages the application's lifespan events.
     """
+    pg_checkpointer.setup()
     yield
 
 
