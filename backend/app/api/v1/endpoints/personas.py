@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.crud import persona as persona_crud
-from app.schemas.persona import PersonaCreate, PersonaResponse, PersonaUpdate
+from app.schemas.persona import (
+    PersonaCreate,
+    PersonaResponse,
+    PersonaUpdate,
+    PersonaLatestResponse,
+)
 
 router = APIRouter()
 
@@ -30,6 +35,17 @@ def list_personas(
     db: Session = Depends(get_db),
 ):
     return persona_crud.get_multi(db, skip=skip, limit=limit, active_only=active_only)
+
+
+@router.get("/latest", response_model=PersonaLatestResponse)
+def get_latest_persona(db: Session = Depends(get_db)):
+    persona = persona_crud.get_latest(db)
+    if not persona:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Persona not found",
+        )
+    return persona
 
 
 @router.get("/{persona_id}", response_model=PersonaResponse)

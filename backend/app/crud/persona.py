@@ -19,6 +19,16 @@ def get(db: Session, persona_id: UUID) -> Optional[Persona]:
     return db.query(Persona).filter(Persona.id == persona_id).first()
 
 
+def get_latest(db: Session) -> Optional[Session]:
+    return (
+        db.query(Persona)
+        .filter(Persona.is_active == True)
+        .order_by(Persona.created_at.desc())
+        .limit(1)
+        .first()
+    )
+
+
 def get_by_username(db: Session, username: str) -> Optional[Persona]:
     return db.query(Persona).filter(Persona.username == username).first()
 
