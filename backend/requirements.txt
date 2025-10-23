@@ -140,7 +140,7 @@ psycopg-pool==3.2.6
     # via
     #   langchain-postgres
     #   langgraph-checkpoint-postgres
-psycopg2==2.9.11
+psycopg2-binary==2.9.11
     # via -r requirements.in
 pyasn1==0.6.1
     # via

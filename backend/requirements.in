@@ -3,7 +3,7 @@ langchain
 langgraph
 langchain-postgres
 asyncpg
-psycopg2
+psycopg2-binary
 sqlalchemy
 alembic
 pydantic-settings
