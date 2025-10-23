@@ -11,7 +11,7 @@ export const Header: React.FC<HeaderProps> = ({ persona, isOnline }) => {
     const profileImage = persona?.profile_image_url || "defaultImage";
 
     return (
-        <header className="flex-shrink-0">
+        <header className="w-full">
             <div className="flex items-center space-x-4">
                 <img
                     src={profileImage}

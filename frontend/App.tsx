@@ -171,14 +171,25 @@ const App: React.FC = () => {
     }, [sessionId, persona, reinitializeSession]);
 
     return (
-        <div className="bg-[#07080A] text-white font-jetbrains-mono fixed inset-0 flex flex-col items-center overflow-hidden">
+        <div className="bg-[#07080A] text-white font-jetbrains-mono fixed inset-0 overflow-hidden">
             <div
-                className="w-full max-w-3xl flex flex-col p-4 sm:p-6 md:p-8"
+                className="flex flex-col mx-auto w-full max-w-3xl"
                 style={{ height: `${viewportHeight}px` }}
             >
-                <Header persona={persona} isOnline={isOnline} />
-                <ChatLog messages={messages} streamingMessage={streamingMessage} isLoading={isLoading} />
-                <MessageInput onSendMessage={handleSendMessage} disabled={isLoading || !isOnline} />
+                {/* Header - Fixed at top */}
+                <div className="flex-shrink-0 px-4 pt-4 sm:px-6 sm:pt-6 md:px-8 md:pt-8">
+                    <Header persona={persona} isOnline={isOnline} />
+                </div>
+
+                {/* Chat Area - Scrollable middle section */}
+                <div className="flex-grow overflow-hidden px-4 sm:px-6 md:px-8">
+                    <ChatLog messages={messages} streamingMessage={streamingMessage} isLoading={isLoading} />
+                </div>
+
+                {/* Input - Fixed at bottom */}
+                <div className="flex-shrink-0 px-4 pb-4 sm:px-6 sm:pb-6 md:px-8 md:pb-8">
+                    <MessageInput onSendMessage={handleSendMessage} disabled={isLoading || !isOnline} />
+                </div>
             </div>
         </div>
     );
