@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-
+from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache, cached
 from cachetools.keys import hashkey
-
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -12,6 +11,8 @@ from app.crud import persona as persona_crud
 from app.crud import session as session_crud
 from app.memory.checkpointers import pg_checkpointer
 from app.models import ChatMessage
+
+ist = timezone(timedelta(hours=5, minutes=30))
 
 
 @dataclass
@@ -54,9 +55,11 @@ def conversation(persona_id: str, input_message: str, session_id: str):
     with SessionLocal() as db:
         persona = persona_crud.get(db, persona_id=persona_id)
 
+    prompt = persona.prompt + f"\nThe current time is {datetime.now(ist)} IST"
+
     agent = create_agent(
         model=model,
-        system_prompt=persona.prompt,
+        system_prompt=prompt,
         context_schema=Context,
         checkpointer=pg_checkpointer,
     )
@@ -65,7 +68,9 @@ def conversation(persona_id: str, input_message: str, session_id: str):
 
     response = ""
     for token, _ in agent.stream(
-        input={"messages": [{"role": "user", "content": input_message}]},
+        input={
+            "messages": [{"role": "user", "content": input_message}],
+        },
         stream_mode="messages",
         config=config,
         context=Context(persona_id=persona_id),

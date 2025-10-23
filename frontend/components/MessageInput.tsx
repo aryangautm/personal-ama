@@ -18,6 +18,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disab
         }
     }, [inputValue]);
 
+    // Handle focus state when disabled prop changes
+    useEffect(() => {
+        if (disabled) {
+            // Clear focus state when disabled
+            setIsFocused(false);
+        } else {
+            // Re-focus the input when re-enabled
+            inputRef.current?.focus({ preventScroll: true });
+        }
+    }, [disabled]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (inputValue.trim() && !disabled) {
