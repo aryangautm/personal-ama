@@ -1,0 +1,50 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'The branch to deploy'
+        required: true
+        type: string
+        default: 'main'
+
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'LICENSE'
+      - 'docs/**'
+      - '.vscode/**'
+      - '.idea/**'
+      - '.env.example'
+
+jobs:
+  deploy-to-prod:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout correct branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch_name || github.ref }}
+
+      - name: Create .env file for Docker Compose
+        run: |
+          echo "${{ secrets.PRODUCTION_ENV }}" > .env
+        
+      - name: Build images
+        run: docker compose build
+
+      - name: Run Alembic migrations
+        run: docker compose run --rm api alembic upgrade head
+
+      - name: Deploy containers
+        run: docker compose up -d
+
+      - name: Clean up old Docker images
+        run: |
+          docker image prune -af
