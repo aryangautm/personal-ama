@@ -12,7 +12,6 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
-        VITE_APP_AUTH_KEY: ${VITE_APP_AUTH_KEY}
     ports:
       - "3000:80" # Map host port 3000 to the container's Nginx port 80
     depends_on:
