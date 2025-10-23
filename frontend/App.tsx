@@ -15,6 +15,23 @@ const App: React.FC = () => {
 
     const sessionIdRef = useRef<string | null>(null);
 
+    // Update document title and favicon when persona is loaded
+    useEffect(() => {
+        if (persona) {
+            document.title = `${persona.public_name} - Ask Me Anything`;
+
+            if (persona.profile_image_url) {
+                let favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+                if (!favicon) {
+                    favicon = document.createElement('link');
+                    favicon.rel = 'icon';
+                    document.head.appendChild(favicon);
+                }
+                favicon.href = persona.profile_image_url;
+            }
+        }
+    }, [persona]);
+
     // Fetch persona and initialize session on mount
     useEffect(() => {
         const initializeApp = async () => {
