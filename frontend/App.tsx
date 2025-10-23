@@ -12,8 +12,32 @@ const App: React.FC = () => {
     const [persona, setPersona] = useState<Persona | null>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [isOnline, setIsOnline] = useState<boolean>(false);
+    const [viewportHeight, setViewportHeight] = useState<number>(window.innerHeight);
 
     const sessionIdRef = useRef<string | null>(null);
+
+    // Handle viewport height changes (especially for mobile keyboard)
+    useEffect(() => {
+        const handleResize = () => {
+            // Use the actual visual viewport height
+            setViewportHeight(window.innerHeight);
+        };
+
+        // Listen to both resize and visualViewport events
+        window.addEventListener('resize', handleResize);
+
+        // Visual Viewport API for better mobile keyboard handling
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleResize);
+        }
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
 
     // Update document title and favicon when persona is loaded
     useEffect(() => {
@@ -147,8 +171,11 @@ const App: React.FC = () => {
     }, [sessionId, persona, reinitializeSession]);
 
     return (
-        <div className="bg-[#07080A] text-white font-jetbrains-mono min-h-screen flex flex-col items-center">
-            <div className="w-full max-w-3xl h-screen flex flex-col p-4 sm:p-6 md:p-8">
+        <div className="bg-[#07080A] text-white font-jetbrains-mono fixed inset-0 flex flex-col items-center overflow-hidden">
+            <div
+                className="w-full max-w-3xl flex flex-col p-4 sm:p-6 md:p-8"
+                style={{ height: `${viewportHeight}px` }}
+            >
                 <Header persona={persona} isOnline={isOnline} />
                 <ChatLog messages={messages} streamingMessage={streamingMessage} isLoading={isLoading} />
                 <MessageInput onSendMessage={handleSendMessage} disabled={isLoading || !isOnline} />
