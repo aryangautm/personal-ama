@@ -30,7 +30,7 @@ def chat_init(persona_id: UUID, db: Session = Depends(get_db)):
     return ChatInit(session_id=str(session.id))
 
 
-@router.post("/{session_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/stream/{session_id}", status_code=status.HTTP_201_CREATED)
 def chat_stream(session_id: str, chat_in: ChatInvoke, db: Session = Depends(get_db)):
 
     session = session_crud.get_session(db, session_id=session_id)

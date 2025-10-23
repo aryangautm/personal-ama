@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.api.v1.endpoints import personas, chat
+from app.core.auth import require_api_key
 
 api_router = APIRouter()
 

@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.auth import require_api_key
 from app.core.database import get_db
 from app.crud import persona as persona_crud
 from app.schemas.persona import (
@@ -16,7 +17,12 @@ from app.schemas.persona import (
 router = APIRouter()
 
 
-@router.post("/", response_model=PersonaResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=PersonaResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_api_key)],
+)
 def create_persona(persona_in: PersonaCreate, db: Session = Depends(get_db)):
     existing = persona_crud.get_by_username(db, username=persona_in.username)
     if existing:
@@ -27,7 +33,9 @@ def create_persona(persona_in: PersonaCreate, db: Session = Depends(get_db)):
     return persona_crud.create(db, obj_in=persona_in)
 
 
-@router.get("/", response_model=List[PersonaResponse])
+@router.get(
+    "/", response_model=List[PersonaResponse], dependencies=[Depends(require_api_key)]
+)
 def list_personas(
     skip: int = 0,
     limit: int = 100,
@@ -48,7 +56,11 @@ def get_latest_persona(db: Session = Depends(get_db)):
     return persona
 
 
-@router.get("/{persona_id}", response_model=PersonaResponse)
+@router.get(
+    "/{persona_id}",
+    response_model=PersonaResponse,
+    dependencies=[Depends(require_api_key)],
+)
 def get_persona(persona_id: UUID, db: Session = Depends(get_db)):
     persona = persona_crud.get(db, persona_id=persona_id)
     if not persona:
@@ -59,7 +71,11 @@ def get_persona(persona_id: UUID, db: Session = Depends(get_db)):
     return persona
 
 
-@router.get("/username/{username}", response_model=PersonaResponse)
+@router.get(
+    "/username/{username}",
+    response_model=PersonaResponse,
+    dependencies=[Depends(require_api_key)],
+)
 def get_persona_by_username(username: str, db: Session = Depends(get_db)):
     persona = persona_crud.get_by_username(db, username=username)
     if not persona:
@@ -70,7 +86,11 @@ def get_persona_by_username(username: str, db: Session = Depends(get_db)):
     return persona
 
 
-@router.patch("/{persona_id}", response_model=PersonaResponse)
+@router.patch(
+    "/{persona_id}",
+    response_model=PersonaResponse,
+    dependencies=[Depends(require_api_key)],
+)
 def update_persona(
     persona_id: UUID, persona_in: PersonaUpdate, db: Session = Depends(get_db)
 ):
@@ -90,7 +110,11 @@ def update_persona(
     return persona_crud.update(db, db_obj=persona, obj_in=persona_in)
 
 
-@router.delete("/{persona_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{persona_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_api_key)],
+)
 def delete_persona(persona_id: UUID, db: Session = Depends(get_db)):
     persona = persona_crud.delete(db, persona_id=persona_id)
     if not persona:

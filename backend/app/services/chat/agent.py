@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+from cachetools import TTLCache, cached
+from cachetools.keys import hashkey
+
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langgraph.graph.state import CompiledStateGraph
 
 from app.core.config import settings
 from app.core.database import SessionLocal
@@ -17,33 +19,23 @@ class Context:
     persona_id: str
 
 
-_agent = {}
+@cached(
+    cache=TTLCache(maxsize=100, ttl=3600), key=lambda persona_id: hashkey(persona_id)
+)
+def get_model(persona_id) -> ChatGoogleGenerativeAI:
 
+    print(f"Cache miss: Getting model for persona_id: {persona_id}")
 
-def get_agent(persona_id) -> CompiledStateGraph:
+    with SessionLocal() as db:
+        persona = persona_crud.get(db, persona_id=persona_id)
 
-    global _agent
+    model = ChatGoogleGenerativeAI(
+        model=persona.llm_model or "gemini-2.5-flash-lite",
+        google_api_key=settings.GOOGLE_API_KEY,
+        temperature=persona.temperature or 0.7,
+    )
 
-    if not _agent.get(persona_id):
-        with SessionLocal() as db:
-            persona = persona_crud.get(db, persona_id=persona_id)
-
-        model = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash-lite",
-            google_api_key=settings.GOOGLE_API_KEY,
-            temperature=persona.temperature or 0.7,
-        )
-
-        agent = create_agent(
-            model=model,
-            system_prompt=persona.prompt,
-            context_schema=Context,
-            checkpointer=pg_checkpointer,
-        )
-
-        _agent[persona_id] = agent
-
-    return _agent[persona_id]
+    return model
 
 
 def _callback_handler(session_id: str, role: str, message: str) -> None:
@@ -57,7 +49,18 @@ def _callback_handler(session_id: str, role: str, message: str) -> None:
 
 
 def conversation(persona_id: str, input_message: str, session_id: str):
-    agent = get_agent(persona_id)
+    model = get_model(persona_id)
+
+    with SessionLocal() as db:
+        persona = persona_crud.get(db, persona_id=persona_id)
+
+    agent = create_agent(
+        model=model,
+        system_prompt=persona.prompt,
+        context_schema=Context,
+        checkpointer=pg_checkpointer,
+    )
+
     config = {"configurable": {"thread_id": session_id, "persona_id": persona_id}}
 
     response = ""
