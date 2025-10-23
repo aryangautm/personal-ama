@@ -79,7 +79,7 @@ export const ChatLog: React.FC<ChatLogProps> = ({ messages, streamingMessage, is
     }, [messages, streamingMessage]);
 
     return (
-        <div ref={scrollRef} className="flex-grow overflow-y-auto py-6 space-y-4 pr-2">
+        <div ref={scrollRef} className="h-full overflow-y-auto py-6 space-y-4 pr-2">
             {messages.map((msg) => (
                 <MessageBubble key={msg.id} message={msg} />
             ))}
