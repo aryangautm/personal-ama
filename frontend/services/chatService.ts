@@ -1,11 +1,15 @@
-import { API_URL } from '../api/config';
+import { API_URL, APP_AUTH_KEY } from '../api/config';
 import { Persona, ChatInitResponse, ChatInvokeRequest } from '../types';
-console.log(API_URL);
+
 
 // Fetch the latest persona
 export async function fetchLatestPersona(): Promise<Persona | null> {
     try {
-        const response = await fetch(`${API_URL}/v1/personas/latest`);
+        const response = await fetch(`${API_URL}/v1/personas/latest`, {
+            headers: {
+                'X-API-Key': APP_AUTH_KEY,
+            },
+        });
         if (!response.ok) {
             console.error('Failed to fetch persona:', response.status);
             return null;
@@ -21,7 +25,11 @@ export async function fetchLatestPersona(): Promise<Persona | null> {
 // Initialize chat session
 export async function initChatSession(personaId: string): Promise<string | null> {
     try {
-        const response = await fetch(`${API_URL}/v1/chat/init/${personaId}`);
+        const response = await fetch(`${API_URL}/v1/chat/init/${personaId}`, {
+            headers: {
+                'X-API-Key': APP_AUTH_KEY,
+            },
+        });
         if (!response.ok) {
             console.error('Failed to initialize chat session:', response.status);
             return null;
@@ -48,6 +56,7 @@ export async function* streamChatResponse(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-API-Key': APP_AUTH_KEY,
             },
             body: JSON.stringify(requestBody),
         });
