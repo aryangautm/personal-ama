@@ -75,7 +75,18 @@ const App: React.FC = () => {
         const initializeApp = async () => {
             // Fetch persona
             const fetchedPersona = await fetchLatestPersona();
-            if (fetchedPersona) {
+            if (fetchedPersona && 'status' in fetchedPersona) {
+                if (fetchedPersona.status === 429) {
+                    setMessages([
+                        {
+                            id: '1',
+                            text: "slow down dude :/",
+                            sender: 'bot',
+                        },
+                    ]);
+                }
+                setIsOnline(false);
+            } else if (fetchedPersona && 'id' in fetchedPersona) {
                 setPersona(fetchedPersona);
                 setIsOnline(true);
 
