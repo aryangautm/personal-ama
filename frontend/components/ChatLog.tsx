@@ -137,7 +137,7 @@ export const ChatLog: React.FC<ChatLogProps> = ({ messages, streamingMessage, is
             {/* Streaming message is a bot message */}
             {streamingMessage && (
                 <div className="flex justify-start">
-                    <p className="text-[#D6A549] font-medium max-w-[50%] break-words">
+                    <p className="text-[#D6A549] font-medium max-w-[80%] break-words">
                         <span className="select-none">&gt; </span>{streamingMessage}
                     </p>
                 </div>
