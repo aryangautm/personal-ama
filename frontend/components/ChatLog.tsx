@@ -14,7 +14,7 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
     if (message.sender === 'user') {
         return (
             <div className="flex justify-end">
-                <p className="text-white font-light max-w-[50%] text-right break-words">
+                <p className="text-white font-light max-w-[80%] text-right break-words">
                     {message.text}<span className="select-none"> &lt;</span>
                 </p>
             </div>
@@ -24,7 +24,7 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
     // Bot message: left-aligned, yellow, starts with '>', renders markdown
     return (
         <div className="flex justify-start">
-            <div className="text-[#D6A549] font-light max-w-[50%] break-words markdown-content">
+            <div className="text-[#D6A549] font-light max-w-[80%] break-words markdown-content">
                 <span className="select-none">&gt; </span>
                 <ReactMarkdown
                     components={{
@@ -77,6 +77,49 @@ export const ChatLog: React.FC<ChatLogProps> = ({ messages, streamingMessage, is
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages, streamingMessage]);
+
+    // Keep scrolled to bottom on viewport/container size changes (e.g., mobile keyboard open)
+    useEffect(() => {
+        const scrollToBottom = () => {
+            const el = scrollRef.current;
+            if (!el) return;
+            // Use rAF to ensure layout has settled after resize
+            requestAnimationFrame(() => {
+                el.scrollTop = el.scrollHeight;
+            });
+        };
+
+        // Window resize and orientation changes
+        window.addEventListener('resize', scrollToBottom);
+        window.addEventListener('orientationchange', scrollToBottom as any);
+
+        // VisualViewport changes (mobile keyboards)
+        const vv = (window as any).visualViewport as VisualViewport | undefined;
+        if (vv) {
+            vv.addEventListener('resize', scrollToBottom);
+            vv.addEventListener('scroll', scrollToBottom);
+        }
+
+        // Observe the scroll container size changes
+        let resizeObserver: ResizeObserver | null = null;
+        if (scrollRef.current && typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => scrollToBottom());
+            resizeObserver.observe(scrollRef.current);
+        }
+
+        // Initial adjustment
+        scrollToBottom();
+
+        return () => {
+            window.removeEventListener('resize', scrollToBottom);
+            window.removeEventListener('orientationchange', scrollToBottom as any);
+            if (vv) {
+                vv.removeEventListener('resize', scrollToBottom);
+                vv.removeEventListener('scroll', scrollToBottom);
+            }
+            if (resizeObserver) resizeObserver.disconnect();
+        };
+    }, []);
 
     return (
         <div ref={scrollRef} className="h-full overflow-y-auto py-6 space-y-4 pr-2">
