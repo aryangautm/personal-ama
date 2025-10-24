@@ -70,7 +70,7 @@ const App: React.FC = () => {
         }
     }, [persona]);
 
-    // Fetch persona and initialize session on mount
+    // Fetch persona on mount
     useEffect(() => {
         const initializeApp = async () => {
             // Fetch persona
@@ -79,24 +79,15 @@ const App: React.FC = () => {
                 setPersona(fetchedPersona);
                 setIsOnline(true);
 
-                // Initialize chat session
-                const newSessionId = await initChatSession(fetchedPersona.id);
-                if (newSessionId) {
-                    setSessionId(newSessionId);
-                    sessionIdRef.current = newSessionId;
-
-                    // Add welcome message if available
-                    if (fetchedPersona.welcome_message) {
-                        setMessages([
-                            {
-                                id: '1',
-                                text: fetchedPersona.welcome_message,
-                                sender: 'bot',
-                            },
-                        ]);
-                    }
-                } else {
-                    setIsOnline(false);
+                // Add welcome message if available
+                if (fetchedPersona.welcome_message) {
+                    setMessages([
+                        {
+                            id: '1',
+                            text: fetchedPersona.welcome_message,
+                            sender: 'bot',
+                        },
+                    ]);
                 }
             } else {
                 setIsOnline(false);
@@ -120,7 +111,7 @@ const App: React.FC = () => {
     }, [persona]);
 
     const handleSendMessage = useCallback(async (text: string) => {
-        if (!text.trim() || !sessionId || !persona) return;
+        if (!text.trim() || !persona) return;
 
         const userMessage: Message = { id: Date.now().toString(), text, sender: 'user' };
         setMessages(prev => [...prev, userMessage]);
@@ -131,8 +122,17 @@ const App: React.FC = () => {
         let currentSessionId = sessionIdRef.current;
 
         try {
+            // Initialize session on first message if not already created
             if (!currentSessionId) {
-                throw new Error('No session ID available');
+                console.log('Initializing session on first message...');
+                currentSessionId = await initChatSession(persona.id);
+
+                if (!currentSessionId) {
+                    throw new Error('Failed to initialize session');
+                }
+
+                setSessionId(currentSessionId);
+                sessionIdRef.current = currentSessionId;
             }
 
             const stream = streamChatResponse(currentSessionId, text);
@@ -182,7 +182,7 @@ const App: React.FC = () => {
             setStreamingMessage('');
             setIsLoading(false);
         }
-    }, [sessionId, persona, reinitializeSession]);
+    }, [persona, reinitializeSession]);
 
     return (
         <div className="bg-[#07080A] text-white font-jetbrains-mono fixed inset-0 overflow-hidden">
