@@ -1,6 +1,6 @@
 from app.crud import session as session_crud
 from app.crud import persona as persona_crud
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.chat import ChatInvoke, ChatInit
@@ -8,12 +8,15 @@ from fastapi.responses import StreamingResponse
 from app.services.chat.agent import conversation
 from app.models import ChatMessage
 from uuid import UUID
+from app.core.security import limiter
+from app.core.config import settings
 
 router = APIRouter()
 
 
 @router.get("/init/{persona_id}", response_model=ChatInit)
-def chat_init(persona_id: UUID, db: Session = Depends(get_db)):
+@limiter.limit([settings.RATE_LIMIT])
+def chat_init(persona_id: UUID, request: Request, db: Session = Depends(get_db)):
 
     persona = persona_crud.get(db, persona_id=persona_id)
     if not persona:
@@ -31,7 +34,13 @@ def chat_init(persona_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.post("/stream/{session_id}", status_code=status.HTTP_201_CREATED)
-def chat_stream(session_id: str, chat_in: ChatInvoke, db: Session = Depends(get_db)):
+@limiter.limit([settings.RATE_LIMIT])
+def chat_stream(
+    session_id: str,
+    chat_in: ChatInvoke,
+    request: Request,
+    db: Session = Depends(get_db),
+):
 
     session = session_crud.get_session(db, session_id=session_id)
 

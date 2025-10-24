@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_api_key
@@ -13,6 +13,8 @@ from app.schemas.persona import (
     PersonaUpdate,
     PersonaLatestResponse,
 )
+from app.core.security import limiter
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -46,7 +48,8 @@ def list_personas(
 
 
 @router.get("/latest", response_model=PersonaLatestResponse)
-def get_latest_persona(db: Session = Depends(get_db)):
+@limiter.limit([settings.RATE_LIMIT])
+def get_latest_persona(request: Request, db: Session = Depends(get_db)):
     persona = persona_crud.get_latest(db)
     if not persona:
         raise HTTPException(

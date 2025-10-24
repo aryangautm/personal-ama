@@ -3,7 +3,7 @@ import { Persona, ChatInitResponse, ChatInvokeRequest } from '../types';
 
 
 // Fetch the latest persona
-export async function fetchLatestPersona(): Promise<Persona | null> {
+export async function fetchLatestPersona(): Promise<Persona | null | { status: number }> {
     try {
         const response = await fetch(`${API_URL}/v1/personas/latest`, {
             headers: {
@@ -12,7 +12,7 @@ export async function fetchLatestPersona(): Promise<Persona | null> {
         });
         if (!response.ok) {
             console.error('Failed to fetch persona:', response.status);
-            return null;
+            return { status: response.status };
         }
         const data = await response.json();
         return data;
