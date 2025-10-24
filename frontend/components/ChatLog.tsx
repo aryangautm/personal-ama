@@ -14,7 +14,7 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
     if (message.sender === 'user') {
         return (
             <div className="flex justify-end">
-                <p className="text-white font-light max-w-[80%] text-right break-words">
+                <p className="text-white font-light max-w-[80%] text-right break-words whitespace-pre-wrap">
                     {message.text}<span className="select-none"> &lt;</span>
                 </p>
             </div>
@@ -28,7 +28,8 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
                 <span className="select-none">&gt; </span>
                 <ReactMarkdown
                     components={{
-                        p: ({ children }) => <span>{children}</span>,
+                        p: ({ children }) => <span className="block mb-2 last:mb-0">{children}</span>,
+                        br: () => <br />,
                         code: ({ children, className }) => {
                             const isInline = !className;
                             return isInline ? (
@@ -137,7 +138,7 @@ export const ChatLog: React.FC<ChatLogProps> = ({ messages, streamingMessage, is
             {/* Streaming message is a bot message */}
             {streamingMessage && (
                 <div className="flex justify-start">
-                    <p className="text-[#D6A549] font-medium max-w-[80%] break-words">
+                    <p className="text-[#D6A549] font-medium max-w-[80%] break-words whitespace-pre-wrap">
                         <span className="select-none">&gt; </span>{streamingMessage}
                     </p>
                 </div>
