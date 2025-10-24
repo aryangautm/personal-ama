@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ persona, isOnline }) => {
     const displayName = persona?.public_name || "";
-    const profileImage = persona?.profile_image_url || "defaultImage";
+    const profileImage = persona?.profile_image_url || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZTfeZyVr7GyW1ygsIqMmADllxP3iwG1h6gw&s";
 
     return (
         <header className="w-full">

@@ -9,19 +9,6 @@ on:
         type: string
         default: 'main'
 
-  push:
-    branches:
-      - 'main'
-    paths-ignore:
-      - '**.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'LICENSE'
-      - 'docs/**'
-      - '.vscode/**'
-      - '.idea/**'
-      - '.env.example'
-
 jobs:
   deploy-to-prod:
     runs-on: self-hosted
