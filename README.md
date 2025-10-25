@@ -1,6 +1,4 @@
-# Personal AMA - AI powered anonymous Chat
-
-![Logo](https://github.com/user-attachments/assets/71d6b749-f30a-46a0-9d7e-6b6d064e3eb2)
+# 💬 Personal AMA - AI powered anonymous Chat
 
 AI-powered anonymous chat application where users can ask questions and get responses through AI personas.
 
