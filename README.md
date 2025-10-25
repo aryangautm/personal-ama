@@ -1,4 +1,4 @@
-# 💬 Personal AMA - AI powered anonymous Chat
+# 💬 Personal AMA - AI powered Anonymous Chat
 
 AI-powered anonymous chat application where users can ask questions and get responses through AI personas.
 
